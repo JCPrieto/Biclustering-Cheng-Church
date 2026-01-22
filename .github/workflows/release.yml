@@ -34,6 +34,9 @@ jobs:
             jpackage_type: MSI
           - os: macos-latest
             jpackage_type: DMG
+    defaults:
+      run:
+        shell: bash
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -45,7 +48,7 @@ jobs:
           java-version: "21"
           cache: maven
       - name: Package
-        run: mvn -B -DskipTests package -Djpackage.type=${{ matrix.jpackage_type }}
+        run: mvn -B -DskipTests -Djpackage.type=${{ matrix.jpackage_type }} package
       - name: Collect artifacts
         run: |
           mkdir -p dist
