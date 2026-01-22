@@ -90,8 +90,8 @@ public class Paint extends java.awt.Frame {
                         aux = cad[i];
                         dato = Double.parseDouble(aux);
                         series.add(j, dato);
-                        grafico.addSeries(series);
                     }
+                    grafico.addSeries(series);
                 }
             } catch (IOException e1) {
                 // TODO Auto-generated catch block

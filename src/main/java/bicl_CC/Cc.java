@@ -10,6 +10,7 @@ import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.ReplaceMissingValues;
 
 import java.io.*;
+import java.nio.file.FileSystems;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
@@ -91,11 +92,11 @@ public class Cc {
     private void psTxt(int n, int numGen, double max, double min) {
 
         try {
-            fw = new FileWriter("Executions\\" + dir + "\\" + "psbicl" + (n + 1) + ".txt");
+            fw = new FileWriter("Executions" + FileSystems.getDefault().getSeparator() + dir + FileSystems.getDefault().getSeparator() + "psbicl" + (n + 1) + ".txt");
             bw = new BufferedWriter(fw);
             salida = new PrintWriter(bw);
             salida.println("set terminal postscript color solid");
-            salida.println("set output '" + f1.getAbsolutePath() + "\\" + "GrafBiclus" + (n + 1) + ".ps" + "'");
+            salida.println("set output '" + f1.getAbsolutePath() + FileSystems.getDefault().getSeparator() + "GrafBiclus" + (n + 1) + ".ps" + "'");
             salida.println("set title 'psbicl" + (n + 1) + ".txt'");
             salida.println("set yrange [" + min + ":" + max + "]");
             salida.println("set key off");
@@ -116,7 +117,7 @@ public class Cc {
         for (int i = 0; i < b.length; i++) {
             if (C[i]) {
                 for (int j = 0; j < b[0].length; j++) {
-                    if (F[i]) {
+                    if (F[j]) {
                         if (b[i][j] > max) {
                             max = b[i][j];
                         }
@@ -136,7 +137,7 @@ public class Cc {
         for (int i = 0; i < b.length; i++) {
             if (C[i]) {
                 for (int j = 0; j < b[0].length; j++) {
-                    if (F[i]) {
+                    if (F[j]) {
                         if (b[i][j] < min) {
                             min = b[i][j];
                         }
@@ -166,13 +167,13 @@ public class Cc {
     private String direcSal() {
         Date h = new Date();
         String dirc = m_Data.relationName() + "_" + h.getDate() + "-" + (h.getMonth() + 1) + "-" + (h.getYear() + 1900) + "_" + h.getHours() + "-" + h.getMinutes();
-        f1 = new File("Executions\\" + dirc);
+        f1 = new File("Executions" + FileSystems.getDefault().getSeparator() + dirc);
         f1.mkdir();
         try {
-            fw = new FileWriter("Executions\\" + dirc + "\\" + (dirc + ".txt"));
+            fw = new FileWriter("Executions" + FileSystems.getDefault().getSeparator() + dirc + FileSystems.getDefault().getSeparator() + (dirc + ".txt"));
             bw = new BufferedWriter(fw);
             salida = new PrintWriter(bw);
-            salida.println("Date: " + h.getDate() + "\\" + (h.getMonth() + 1) + "\\" + (h.getYear() + 1900) + "    Hour: " + h.getHours() + ":" + h.getMinutes());
+            salida.println("Date: " + h.getDate() + FileSystems.getDefault().getSeparator() + (h.getMonth() + 1) + FileSystems.getDefault().getSeparator() + (h.getYear() + 1900) + "    Hour: " + h.getHours() + ":" + h.getMinutes());
             salida.println("Analyzed Dataset: " + m_Data.relationName() + ".arff." + "\nThe archive has "
                     + m_Data.numAttributes() + " genes with "
                     + m_Data.numInstances() + " condition for each gene.");
@@ -181,6 +182,7 @@ public class Cc {
             salida.println("Rank of random numbers. Minimum: " + ranm + " Maximum: " + ranM);
             salida.println("Number of requested Biclusters " + gen);
         } catch (IOException e) {
+            e.printStackTrace();
         } finally {
             salida.close();
         }
@@ -199,7 +201,7 @@ public class Cc {
         try {
             int f, c;
             dirBicl = "\\bicluster" + (i + 1) + ".dat";
-            String dirBicl2 = ("Executions\\" + dir + "\\" + dirBicl);
+            String dirBicl2 = ("Executions" + FileSystems.getDefault().getSeparator() + dir + FileSystems.getDefault().getSeparator() + dirBicl);
             fw = new FileWriter(dirBicl2);
             bw = new BufferedWriter(fw);
             salida = new PrintWriter(bw);
@@ -230,8 +232,8 @@ public class Cc {
         int f, c, p = 1, o = 1;
         try {
 //			Modo append, para cada poder a�adir por cada bicluster
-            tw = new BufferedWriter(new FileWriter("Executions\\" + dir + "\\" + ("GeneralData.txt"), true));
-            bw = new BufferedWriter(new FileWriter("Executions\\" + dir + "\\" + (dir + ".txt"), true));
+            tw = new BufferedWriter(new FileWriter("Executions" + FileSystems.getDefault().getSeparator() + dir + FileSystems.getDefault().getSeparator() + ("GeneralData.txt"), true));
+            bw = new BufferedWriter(new FileWriter("Executions" + FileSystems.getDefault().getSeparator() + dir + FileSystems.getDefault().getSeparator() + (dir + ".txt"), true));
             salida = new PrintWriter(bw);
             gendat = new PrintWriter(tw);
             //Identificacion.
@@ -694,10 +696,10 @@ public class Cc {
      * @param gen2
      */
     private void crearScript(int n) {
-        File f = new File("Executions\\" + dir + "\\" + "psbicl" + (n + 1) + ".txt");
-        File f2 = new File("gnuplot\\bin\\pgnuplot.exe");
+        File f = new File("Executions" + FileSystems.getDefault().getSeparator() + dir + FileSystems.getDefault().getSeparator() + "psbicl" + (n + 1) + ".txt");
+        File f2 = new File("gnuplot" + FileSystems.getDefault().getSeparator() + "bin" + FileSystems.getDefault().getSeparator() + "pgnuplot.exe");
         try {
-            bw = new BufferedWriter(new FileWriter("Executions\\" + dir + "\\Generator.bat", true));
+            bw = new BufferedWriter(new FileWriter("Executions" + FileSystems.getDefault().getSeparator() + dir + FileSystems.getDefault().getSeparator() + "Generator.bat", true));
             salida = new PrintWriter(bw);
             salida.println(f2.getAbsolutePath() + " " + f.getAbsolutePath());
         } catch (IOException e) {
@@ -711,8 +713,8 @@ public class Cc {
     @SuppressWarnings("deprecation")
     private void finAnalisis() {
         try {
-            bw = new BufferedWriter(new FileWriter("Executions\\" + dir + "\\" + (dir + ".txt"), true));
-            tw = new BufferedWriter(new FileWriter("Executions\\" + dir + "\\" + ("GeneralData.txt"), true));
+            bw = new BufferedWriter(new FileWriter("Executions" + FileSystems.getDefault().getSeparator() + dir + FileSystems.getDefault().getSeparator() + (dir + ".txt"), true));
+            tw = new BufferedWriter(new FileWriter("Executions" + FileSystems.getDefault().getSeparator() + dir + FileSystems.getDefault().getSeparator() + ("GeneralData.txt"), true));
             salida = new PrintWriter(bw);
             gendat = new PrintWriter(tw);
             //Identificacion.
