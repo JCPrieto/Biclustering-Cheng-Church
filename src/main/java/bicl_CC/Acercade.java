@@ -6,9 +6,20 @@
  */
 package bicl_CC;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+
 import javax.swing.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Properties;
 
 /**
  * @author Juanky
@@ -47,7 +58,7 @@ public class Acercade extends JDialog {
         setName("Acerca de...");
         Info.setBackground(java.awt.Color.lightGray);
         Info.setEditable(false);
-        Info.setText("Biclustering of Cheng and Church V.1.0\n\nImplementation of the Algorithm of Biclustering of Cheng and Church" +
+        Info.setText("Biclustering of Cheng and Church V." + loadVersion() + "\n\nImplementation of the Algorithm of Biclustering of Cheng and Church" +
                 ", \nthat is based in the one erased and insert of nodes to find " +
                 "submatrix \nin the microarray that show a low residual value." +
                 "\n\nThis implementation is alpha for what we thank all type of suggestions \nand the bugs notification and problems" +
@@ -63,5 +74,59 @@ public class Acercade extends JDialog {
         });
         getContentPane().add(aceptar, java.awt.BorderLayout.SOUTH);
         pack();
+    }
+
+    private String loadVersion() {
+        Properties props = new Properties();
+        String version = null;
+        try (InputStream in = getClass().getResourceAsStream("/app.properties")) {
+            if (in != null) {
+                props.load(in);
+                version = props.getProperty("app.version");
+            }
+        } catch (IOException e) {
+            // fall back to pom.xml lookup
+        }
+        version = cleanVersion(version);
+        if (version != null) {
+            return version;
+        }
+        version = readPomVersion();
+        return version != null ? version : "dev";
+    }
+
+    private String cleanVersion(String version) {
+        if (version == null) {
+            return null;
+        }
+        String trimmed = version.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+        if (trimmed.startsWith("${") || trimmed.startsWith("{")) {
+            return null;
+        }
+        return trimmed;
+    }
+
+    private String readPomVersion() {
+        Path pomPath = Paths.get(System.getProperty("user.dir"), "pom.xml");
+        if (!Files.exists(pomPath)) {
+            return null;
+        }
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(false);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(pomPath.toFile());
+            NodeList versions = doc.getElementsByTagName("version");
+            if (versions.getLength() == 0) {
+                return null;
+            }
+            String text = versions.item(0).getTextContent();
+            return cleanVersion(text);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
