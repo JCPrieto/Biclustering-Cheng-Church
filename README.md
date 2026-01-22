@@ -29,6 +29,108 @@ mvn package
 
 El jar se genera en `target/`.
 
+## Paquetes de distribucion
+
+El proyecto usa `jpackage` via Maven para crear un paquete instalable o una app portable.
+
+### App image (portable)
+
+```bash
+mvn package
+```
+
+Salida en `target/dist/`:
+
+- `target/dist/BiclusteringCC/` (app image)
+- Ejecutable: `target/dist/BiclusteringCC/bin/BiclusteringCC`
+
+### Instalador Linux (.deb)
+
+```bash
+mvn package -Djpackage.type=DEB -Plinux-installer
+```
+
+Salida en `target/dist/` con un archivo `.deb`.
+
+### Instaladores Windows y macOS
+
+Los tipos soportados dependen del SO donde ejecutes el build:
+
+Windows:
+
+```bash
+mvn package -Djpackage.type=MSI
+```
+
+o
+
+```bash
+mvn package -Djpackage.type=EXE
+```
+
+macOS:
+
+```bash
+mvn package -Djpackage.type=DMG
+```
+
+o
+
+```bash
+mvn package -Djpackage.type=PKG
+```
+
+Salida en `target/dist/` con el instalador correspondiente.
+
+Notas de distribucion:
+
+- macOS: para evitar advertencias de seguridad, los paquetes deben estar firmados y notarizados (Apple Developer ID).
+- Windows: SmartScreen puede advertir si el instalador no esta firmado; se recomienda firmar con un certificado de
+  codigo.
+
+Ejemplos (ajusta nombres y rutas):
+
+macOS (firmar y notarizar):
+
+```bash
+codesign --deep --force --options runtime --sign "Developer ID Application: YOUR_NAME (TEAM_ID)" target/dist/BiclusteringCC.app
+xcrun notarytool submit target/dist/BiclusteringCC.dmg --apple-id "APPLE_ID" --team-id "TEAM_ID" --password "APP_SPECIFIC_PASSWORD" --wait
+xcrun stapler staple target/dist/BiclusteringCC.dmg
+```
+
+Windows (firmar):
+
+```bash
+signtool sign /fd SHA256 /a /tr http://timestamp.digicert.com /td SHA256 target\\dist\\BiclusteringCC.msi
+```
+
+## Instalacion
+
+### Linux (.deb)
+
+```bash
+sudo dpkg -i target/dist/*.deb
+```
+
+Si hay dependencias pendientes:
+
+```bash
+sudo apt-get -f install
+```
+
+## Ejecutar (app instalada)
+
+- Desde el menu de aplicaciones: **BiclusteringCC**.
+- Desde terminal (si se creo el lanzador): `BiclusteringCC`.
+
+En Windows, el acceso es desde el menu Inicio. En macOS, desde Applications.
+
+## Ejecutar (app image)
+
+```bash
+target/dist/BiclusteringCC/bin/BiclusteringCC
+```
+
 ## Ejecutar
 
 No hay entrada de consola. Ejecuta desde tu IDE la clase principal:
@@ -58,4 +160,4 @@ bicl_CC.Bicluster
 
 ## Licencia
 
-No especificada.
+Este software se distribuye bajo licencia GNU GPL v3. Ver `LICENSE`.

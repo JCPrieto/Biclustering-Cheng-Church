@@ -9,8 +9,41 @@
 ## Build, Test, and Development Commands
 
 - `mvn package` compiles the code and builds the jar into `target/`.
+- `mvn package` also produces an app image in `target/dist/BiclusteringCC/`.
+- `mvn package -Djpackage.type=DEB -Plinux-installer` builds a Linux `.deb` installer in `target/dist/`.
+- `mvn package -Djpackage.type=MSI|EXE` builds a Windows installer in `target/dist/`.
+- `mvn package -Djpackage.type=DMG|PKG` builds a macOS installer in `target/dist/`.
 - `mvn test` runs tests if/when they are added (no tests are present yet).
 - Run the app from your IDE using the main class `bicl_CC.Bicluster`.
+
+## Distribution, Install, and Run
+
+- App image (portable): run `target/dist/BiclusteringCC/bin/BiclusteringCC`.
+- Linux install: `sudo dpkg -i target/dist/*.deb` (then `sudo apt-get -f install` if needed).
+- Installed app: launch **BiclusteringCC** from the desktop menu or run `BiclusteringCC` from a terminal if available.
+- Windows: launch from Start menu after installing the `.msi`/`.exe`.
+- macOS: launch from Applications after installing the `.dmg`/`.pkg`.
+
+## Distribution Notes
+
+- macOS packages should be signed and notarized to avoid Gatekeeper warnings.
+- Windows installers should be code-signed to reduce SmartScreen warnings.
+
+Example commands (adjust names/paths):
+
+macOS:
+
+```bash
+codesign --deep --force --options runtime --sign "Developer ID Application: YOUR_NAME (TEAM_ID)" target/dist/BiclusteringCC.app
+xcrun notarytool submit target/dist/BiclusteringCC.dmg --apple-id "APPLE_ID" --team-id "TEAM_ID" --password "APP_SPECIFIC_PASSWORD" --wait
+xcrun stapler staple target/dist/BiclusteringCC.dmg
+```
+
+Windows:
+
+```bash
+signtool sign /fd SHA256 /a /tr http://timestamp.digicert.com /td SHA256 target\\dist\\BiclusteringCC.msi
+```
 
 ## Coding Style & Naming Conventions
 
